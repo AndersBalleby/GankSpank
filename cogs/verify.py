@@ -1,5 +1,6 @@
 import os
 from discord.ext import commands
+from urllib.parse import unquote
 from riotwatcher import LolWatcher, RiotWatcher, ApiError
 
 lol_watcher = LolWatcher(os.getenv("RIOT_API_KEY"))
@@ -53,7 +54,7 @@ def get_ranks_from_opgg(link: str):
         if not ranked_stats:
             return f"{summoner_name} har ingen ranked data."
 
-        results = []
+        results = [f"**{unquote(summoner_name)}** - ranked stats:"]
         for queue in ranked_stats:
             queue_type = queue["queueType"].replace("_", " ").title()
             tier = queue["tier"]
@@ -73,6 +74,11 @@ class Verify(commands.Cog):
 
     @commands.command()
     async def verify(self, ctx, link: str = None):
+        # Slet brugerens besked
+        try:
+            await ctx.message.delete()
+        except Exception:
+            pass  # Hvis botten ikke har permission, ignorerer vi det
         if link is None:
             await ctx.send("Du skal sende et link, fx: `!verify https://www.op.gg/summoners/euw/Navn`")
             return
