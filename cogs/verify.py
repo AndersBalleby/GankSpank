@@ -23,6 +23,9 @@ region_map = {
     "br": "br1"
 }
 
+#Verification channel
+RESULTS_CHANNEL_ID = 1415301899200237679
+
 def parse_opgg_link(link: str):
     """Extractor region og summoner navn fra et OP.GG link"""
     try:
@@ -98,14 +101,21 @@ class Verify(commands.Cog):
             lp = queue["leaguePoints"]
             results.append(f"{queue_type}: {tier} {rank} ({lp} LP)")
 
-        await ctx.send("\n".join(results))
+        #Skifter til verification channel
+        channel = self.bot.get_channel(RESULTS_CHANNEL_ID)
+        if channel is None:
+            await ctx.send("Resultatkanalen findes ikke, tjek ID.")
+            return
 
+        # Post resultater i verification channel
+        await channel.send("\n".join(results))
+        
         #Rolle tildeling
         highest_tier = get_highest_tier(ranked_stats)
         if highest_tier:
             role = await assign_rank_role(ctx.author, highest_tier)
             if role:
-                await ctx.send(f"Du har fået rollen **{role.name}**!")
+                await channel.send(f"{ctx.author.mention}, du har fået rollen **{role.name}**!")
 
 
 async def setup(bot):
