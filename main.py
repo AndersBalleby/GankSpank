@@ -1,27 +1,30 @@
-import discord
 import os
+import discord
+from discord.ext import commands
 from dotenv import load_dotenv
+
+load_dotenv()
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 
-load_dotenv()
-
-
-@client.event
+@bot.event
 async def on_ready():
-    print(f'Logged in as {client.user}')
+    print(f"Logged in som {bot.user}")
 
+#Loader cogs i cog mappen
+async def load_cogs():
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py") and filename != "__init__.py":
+            await bot.load_extension(f"cogs.{filename[:-3]}")
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+async def main():
+    async with bot:
+        await load_cogs()
+        await bot.start(os.getenv("DISCORD_TOKEN"))
 
-    # Test
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
-
-client.run(os.getenv('DISCORD_TOKEN'))
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
