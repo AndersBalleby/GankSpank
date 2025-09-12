@@ -12,6 +12,7 @@ multidict==6.6.4
 propcache==0.3.2
 python-dotenv==1.1.1
 requests==2.32.5
+riotwatcher==3.3.1
 typing_extensions==4.15.0
 urllib3==2.5.0
 yarl==1.20.1
